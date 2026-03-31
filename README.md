@@ -7,6 +7,7 @@ Next.js app for **Union Health Complex** physicians: register patients, run **vo
 - **Next.js 14** (App Router), **NextAuth** (credentials + JWT)
 - **Prisma** + **PostgreSQL** (local or [Neon](https://neon.tech))
 - **Web Speech API** (browser STT/TTS); optional **OpenAI** (Whisper transcribe + GPT summarize)
+- **Bangla → English translation** via server route `/api/translate` ([MyMemory](https://mymemory.translated.net/) public API; no key; length limits apply)
 - **Netlify** (`@netlify/plugin-nextjs`)
 
 ## Quick start (local)
@@ -14,8 +15,8 @@ Next.js app for **Union Health Complex** physicians: register patients, run **vo
 1. **Clone and install**
 
    ```bash
-   git clone <your-repo-url>
-   cd SWE
+   git clone https://github.com/rajivkalyan/cs584.git
+   cd cs584
    npm install
    ```
 
@@ -62,7 +63,9 @@ Override seed password with `SEED_PASSWORD` in `.env` before `npm run db:seed`.
 | `NEXTAUTH_URL` | Yes | App origin: `http://localhost:3000` locally, `https://your-site.netlify.app` in production |
 | `UHC_DEMO_MODE` | No | `true` = no DB needed; in-memory data + demo login. Use `false` or unset with Neon. |
 | `OPENAI_API_KEY` | No | Cloud transcribe + GPT summary; app has fallbacks if missing |
+| `UHC_DEMO_FALLBACK` | No | When `true`, `/api/transcribe` may return demo placeholder text on network/OpenAI failures instead of an error; in development this is the default unless set to `false` |
 | `UHC_DEMO_EMAIL` / `UHC_DEMO_PASSWORD` | No | Demo login when `UHC_DEMO_MODE=true` |
+| `SEED_PASSWORD` | No | Password for seeded physician (`doctor@shuno.online`) when running `npm run db:seed` |
 
 **Neon (pooled URL):** append `&pgbouncer=true` to `DATABASE_URL` for Prisma + PgBouncer.
 
@@ -101,6 +104,8 @@ Override seed password with `SEED_PASSWORD` in `.env` before `npm run db:seed`.
 | `/patients` | Patient list, edit, delete, intakes |
 | `/history` | Past intakes |
 
+**Notable API routes:** `/api/auth/*` (NextAuth), `/api/patients`, `/api/intakes`, `/api/translate` (MyMemory proxy), `/api/transcribe`, `/api/summarize`, `/api/health/db`.
+
 ## Project layout (short)
 
 - `app/` — pages and API routes (`/api/patients`, `/api/intakes`, `/api/auth`, etc.)
@@ -108,7 +113,10 @@ Override seed password with `SEED_PASSWORD` in `.env` before `npm run db:seed`.
 - `context/` — `LanguageProvider`, `StoreProvider`
 - `lib/` — auth, Prisma/db helpers, copy strings, API client
 - `prisma/` — `schema.prisma`, `seed.js`
+- `_legacy/` — older Deno prototype (not used by the Next.js app)
+
+**Runtime:** Node.js **18+** recommended (matches Next.js 14).
 
 ## License / course use
 
-Private academic / prototype — adjust as needed for your institution.
+Private academic / prototype — adjust as needed for your institution. **Not a HIPAA-compliant or production medical record system**; do not use with real PHI.
