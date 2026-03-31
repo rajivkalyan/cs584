@@ -48,8 +48,8 @@ Next.js app for **Union Health Complex** physicians: register patients, run **vo
 
 | Field    | Value                 |
 |----------|------------------------|
-| Email    | `doctor@shuno.online` |
-| Password | `1234`                 |
+| Email    | `physician@uhc.demo` |
+| Password | `uhc-demo-2026`                 |
 
 Override seed password with `SEED_PASSWORD` in `.env` before `npm run db:seed`.
 
