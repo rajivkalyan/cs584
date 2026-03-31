@@ -1,0 +1,286 @@
+TECHNICAL PROJECT DESCRIPTION (pd.txt)
+Project: Voice-Enabled AI History-Taking Prototype for Primary Health Care in Bangladesh
+Institution: Emory University
+Phase: Week 8-9 (All Core + Stretch Features Complete)
+
+====================================================================
+1) PURPOSE AND CONTEXT
+====================================================================
+This prototype is a voice-enabled medical history-taking system for physicians at Union Health Complexes (UHCs) in rural Bangladesh. UHC physicians see extremely high patient volume (150 patients in ~3 hours), reducing consultation time to ~72–120 seconds per patient. The prototype reduces manual intake burden by capturing spoken patient history and generating clinical summaries for physician review.
+
+LMIC constraints addressed:
+- Intermittent connectivity and low bandwidth
+- Low literacy; preference for voice over text
+- Heterogeneous mobile devices (Android) without app installation
+- HTTPS-required for microphone and browser speech features
+
+Primary stakeholders:
+- UHC physicians: authenticate, register patients, conduct voice intake, review summaries
+- Rural patients: speak symptoms and history via voice prompts
+
+====================================================================
+2) IMPLEMENTED FEATURES (CORE + STRETCH)
+====================================================================
+CORE FEATURES (Week 7-8):
+✅ UHC Physician Login & Auth
+- NextAuth with credentials provider (email + password)
+- JWT sessions with middleware protection
+- Demo Mode for deployments without database
+
+✅ Patient Data Collection
+- Registration form: name, age, gender, village, phone
+- Persistence in PostgreSQL or demo in-memory store
+- Scoped to authenticated physician
+
+✅ Voice Capture Interface
+- Browser MediaRecorder for audio recording
+- Waveform visualization
+- Full audio capture (fixed onstop handler)
+
+✅ STT Pipeline
+- Browser STT: Web Speech API (free, no API key)
+- Cloud STT: OpenAI Whisper via /api/transcribe (optional)
+- Bangla (bn-BD) and English support
+
+✅ Session Persistence
+- PostgreSQL persistence via Prisma
+- In-memory demo mode for Netlify deployments without DB
+- Intakes linked to patients and physicians
+
+STRETCH FEATURES (Week 9):
+✅ Structured History Questionnaire
+- Guided 5-question medical history protocol
+- Questions cover: chief complaint, duration, severity, previous treatment, other symptoms
+- Step-by-step voice recording with progress indicator
+- Available in English and Bangla
+
+✅ Automated Summary Display
+- GPT-4o clinical summary generation via /api/summarize
+- Structured format: Chief Complaint, Duration, Severity, Treatment, Symptoms
+- Displayed on completion and in intake history
+- Summary stored with intake record
+
+✅ Bangla Voice Feedback
+- Text-to-Speech (TTS) via Web Speech API
+- Speaks each question in patient's language (bn-BD or en-US)
+- Replay button to hear question again
+- Guides patient through questionnaire
+
+====================================================================
+3) VOICE INTAKE MODES
+====================================================================
+The /voice page offers TWO modes:
+
+MODE 1: Free-form Recording
+- Single continuous recording
+- Patient describes symptoms in their own words
+- Browser STT transcribes in real-time
+- Optional Whisper cloud transcription for higher accuracy
+- Clinical summary auto-generated from transcript
+
+MODE 2: Guided Questionnaire
+- 5-question structured protocol
+- TTS speaks each question in Bangla or English
+- Patient answers one question at a time
+- Progress indicator shows completion
+- Compiled transcript + clinical summary at end
+
+====================================================================
+4) TECH STACK (COMPLETE)
+====================================================================
+Frontend
+- Next.js (React, App Router)
+- TailwindCSS for styling
+- Web Audio APIs (MediaRecorder, SpeechRecognition, SpeechSynthesis)
+
+Backend
+- Next.js Route Handlers (/app/api)
+- NextAuth for authentication (JWT sessions)
+
+Database
+- PostgreSQL + Prisma ORM (production)
+- In-memory demo store (Netlify demo mode)
+
+AI Services
+- OpenAI Whisper (STT) via /api/transcribe
+- OpenAI GPT-4o (clinical summarization) via /api/summarize
+- Browser Web Speech API (free STT/TTS)
+
+Hosting
+- Netlify (deployment URL for demos)
+
+====================================================================
+5) SYSTEM ARCHITECTURE
+====================================================================
+Client (Browser)
+- UI pages: dashboard, login, patients, voice, history
+- Two voice intake modes: free-form and guided questionnaire
+- Store layer loads patient/intake data after authentication
+
+Server (Next.js API Routes)
+- /api/auth/[...nextauth] - NextAuth handler
+- /api/patients - GET list, POST create (session-scoped)
+- /api/intakes - GET list, POST create (session-scoped)
+- /api/transcribe - POST audio → Whisper transcription
+- /api/summarize - POST transcript → GPT-4o clinical summary
+
+Database (PostgreSQL)
+- Users (physicians with credentials)
+- Patients (demographics linked to physician)
+- Intakes (transcript + summary linked to physician and patient)
+
+Data Isolation
+- All queries scoped by authenticated physician userId
+
+====================================================================
+6) DATA MODEL
+====================================================================
+User (Physician)
+- id, email (unique), name, passwordHash
+- Relations: patients[], intakes[]
+
+Patient
+- id, userId (owner), name, age, gender, village, phone
+- Relations: intakes[]
+
+Intake
+- id, userId (owner), patientId (optional)
+- patientName (denormalized)
+- transcript (full text from voice)
+- summary (GPT-4o clinical summary)
+- date
+
+====================================================================
+7) USER FLOWS
+====================================================================
+Flow 1: Physician Login
+1. Visit site → redirect to /login
+2. Enter physician@uhc.demo / uhc-demo-2026
+3. NextAuth validates (DB or demo mode)
+4. Redirect to dashboard
+
+Flow 2: Register Patient Profile
+1. Dashboard → Register patient
+2. Fill name, age, optional demographics
+3. POST /api/patients
+4. Patient saved and appears in /patients list
+
+Flow 3A: Free-form Voice Intake
+1. Dashboard → Start new intake
+2. Select "Free-form" tab
+3. Click record → patient speaks symptoms
+4. Browser STT transcribes live
+5. Stop recording → transcript displayed
+6. Optional: "Improve with cloud" (Whisper)
+7. GPT-4o generates clinical summary
+8. Intake saved with transcript + summary
+9. Success screen shows summary
+
+Flow 3B: Guided Questionnaire Voice Intake
+1. Dashboard → Start new intake
+2. Select "Guided Questions" tab
+3. TTS speaks Question 1 in Bangla/English
+4. Patient clicks record and answers
+5. Browser STT captures answer
+6. Click "Next" → TTS speaks Question 2
+7. Repeat for all 5 questions
+8. After last question, click "Complete"
+9. GPT-4o generates clinical summary from compiled answers
+10. Intake saved; success screen shows summary
+
+Flow 4: Review Intake History
+1. Physician opens /history
+2. List shows all saved intakes (most recent first)
+3. Select an intake → view:
+   - Clinical summary (if generated)
+   - Full transcript
+   - Patient name and date
+4. Copy transcript to clipboard
+
+====================================================================
+8) DEMO MODE (NETLIFY DEPLOYMENT)
+====================================================================
+When UHC_DEMO_MODE=true or DATABASE_URL is missing:
+- Auth accepts demo credentials from env vars (no DB user needed)
+- Patients and intakes store in-memory (survives server restarts within same Netlify function instance but lost on redeploy)
+- Ideal for quick Netlify Drop deployments and GH partner demos
+
+Production Mode (with PostgreSQL):
+- Auth queries real User table with bcrypt password hash
+- Patients and intakes persist permanently in database
+
+====================================================================
+9) ENVIRONMENT VARIABLES
+====================================================================
+Required for all deployments:
+- NEXTAUTH_SECRET (32+ char random string)
+- NEXTAUTH_URL (e.g. https://your-site.netlify.app)
+
+Optional (Demo Mode - for Netlify without DB):
+- UHC_DEMO_MODE=true
+- UHC_DEMO_EMAIL=physician@uhc.demo
+- UHC_DEMO_PASSWORD=uhc-demo-2026
+
+Optional (AI features):
+- OPENAI_API_KEY (for Whisper STT and GPT-4o summary)
+- UHC_DEMO_FALLBACK=true (return placeholder if API unavailable)
+
+Production only:
+- DATABASE_URL (PostgreSQL connection string)
+
+====================================================================
+10) LOCAL RUN INSTRUCTIONS
+====================================================================
+With PostgreSQL (production mode):
+1. npm install
+2. cp .env.example .env
+3. Set NEXTAUTH_SECRET, DATABASE_URL, optional OPENAI_API_KEY
+4. npx prisma db push
+5. npm run db:seed
+6. npm run dev
+7. Open http://localhost:3000 → login with seeded physician
+
+Demo Mode (no PostgreSQL):
+1. npm install
+2. cp .env.example .env
+3. Set NEXTAUTH_SECRET, UHC_DEMO_MODE=true
+4. npm run dev
+5. Open http://localhost:3000 → login with physician@uhc.demo / uhc-demo-2026
+
+====================================================================
+11) NETLIFY DEPLOYMENT (CURRENT)
+====================================================================
+Deployed URL: https://glowing-granita-7bec90.netlify.app
+
+Environment variables configured:
+- UHC_DEMO_MODE=true
+- NEXTAUTH_SECRET=[set]
+- NEXTAUTH_URL=https://glowing-granita-7bec90.netlify.app
+- Optional: OPENAI_API_KEY (for Whisper + GPT summary)
+
+Login credentials:
+- Email: physician@uhc.demo
+- Password: uhc-demo-2026
+
+====================================================================
+12) SUCCESS CRITERIA VERIFICATION
+====================================================================
+From TDSOW Success Criteria:
+
+1. "A patient record can be created and a voice intake session completed in under 5 minutes"
+   ✅ Direct navigation, minimal fields, one-tap voice flow
+   ✅ Guided questionnaire: 5 questions × ~30s each = ~2.5 min
+
+2. "System successfully generates a readable text summary from recorded Bangla voice"
+   ✅ Browser STT + Whisper for transcription
+   ✅ GPT-4o generates structured clinical summary
+
+3. "GH partner can view and verify aggregated intake summaries via physician dashboard"
+   ✅ Dashboard shows recent intakes
+   ✅ /history shows all intakes with clinical summaries
+   ✅ All data scoped to authenticated physician
+
+====================================================================
+13) COMPLIANCE NOTE (PROTOTYPE)
+====================================================================
+This is a class/research prototype. Browser STT and cloud APIs (Whisper, GPT-4o) involve third-party processing. For demos and usability testing, use synthetic/de-identified data and avoid real patient identifiers (HIPAA consideration).

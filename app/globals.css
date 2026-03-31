@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #0d47a1;
+  --primary-dark: #002171;
+  --touch-min: 48px;
+}
+
+@layer base {
+  html {
+    font-size: 18px;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply text-primary;
+  }
+}
+
+.safe-area-pb {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+@layer components {
+  .btn {
+    @apply min-h-[var(--touch-min)] px-4 py-3 text-base font-semibold rounded-lg border-2 border-primary cursor-pointer transition active:scale-[0.98];
+  }
+  .btn-primary {
+    @apply bg-primary text-white border-primary hover:bg-[#0d3580] shadow-md hover:shadow-lg;
+  }
+  .btn-ghost {
+    @apply bg-transparent border-transparent hover:bg-surface text-primary;
+  }
+  .btn-secondary {
+    @apply bg-surface border-primary text-primary hover:bg-primary/10;
+  }
+  .card {
+    @apply border-2 border-primary rounded-lg p-5 bg-white shadow-md;
+  }
+  .input {
+    @apply w-full min-h-[var(--touch-min)] px-3 py-2.5 text-base border-2 border-primary/30 rounded-lg bg-gray-50 text-primary placeholder:text-primary/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary focus:bg-white transition;
+  }
+  .label {
+    @apply block font-semibold mt-3 mb-1 text-sm first:mt-0;
+  }
+}

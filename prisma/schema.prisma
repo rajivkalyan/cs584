@@ -1,0 +1,58 @@
+// UHC Voice Intake — Data model (TDSOW Figure 2)
+// PostgreSQL recommended (e.g. Neon, Supabase) for Netlify serverless.
+
+generator client {
+  provider      = "prisma-client-js"
+  // Netlify serverless Linux — include multiple engines; wrong one causes runtime "libquery_engine" errors.
+  binaryTargets = ["native", "rhel-openssl-3.0.x", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  // Neon pooler: append &pgbouncer=true (required for Prisma + PgBouncer). See .env.example.
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  name         String?
+  passwordHash String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  patients     Patient[]
+  intakes      Intake[]
+}
+
+model Patient {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  age         Int
+  gender      String?
+  village     String?
+  phone       String?
+  nationalId  String?
+  createdAt   DateTime @default(now())
+  intakes     Intake[]
+
+  @@index([userId])
+}
+
+model Intake {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  patientId   String?
+  patient     Patient? @relation(fields: [patientId], references: [id], onDelete: SetNull)
+  patientName String
+  transcript  String?
+  translation String?
+  summary     String?
+  date        DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([date])
+}

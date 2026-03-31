@@ -1,0 +1,98 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{parskip}
+\usepackage{hyperref}
+
+\title{MVP Delivery \& Sprint Checkpoint\\Feature Table \& Reflection}
+\author{Alex Rivera\\CS 584 / Software Engineering}
+\date{Submitted: March 27, 2026}
+
+\begin{document}
+\maketitle
+
+\section*{Part 1: Feature Completion Table}
+
+\noindent\textit{Features are taken from the final Technical Design Statement of Work (TDSOW) submitted February 26, 2026, for the SHUNO voice-enabled history-taking prototype for Union Health Complexes (UHC), Bangladesh.}
+
+\vspace{0.5em}
+
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{3.4cm}>{\centering\arraybackslash}p{1.9cm}>{\centering\arraybackslash}p{2.0cm}>{\centering\arraybackslash}p{2.0cm}>{\raggedright\arraybackslash}p{4.7cm}@{}}
+\toprule
+\textbf{Feature} &
+\textbf{SOW difficulty} &
+\textbf{Current difficulty} &
+\textbf{Status} &
+\textbf{Notes} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Feature} &
+\textbf{SOW difficulty} &
+\textbf{Current difficulty} &
+\textbf{Status} &
+\textbf{Notes} \\
+\midrule
+\endhead
+\bottomrule
+\endlastfoot
+
+UHC Physician Login \& Auth
+  & Medium & Medium & Complete
+  & NextAuth.js credentials + JWT; demo mode for Netlify without DB; seeded physician in Postgres for production. \\
+
+Patient Data Collection
+  & Easy & Low & Complete
+  & Create/list/edit/delete patients; national ID field; intakes linked to patient; quick register on intake screen. \\
+
+Voice Capture Interface
+  & Medium & Medium & Complete
+  & MediaRecorder + waveform UI; free-form and guided modes; patient language toggle independent of UI language. \\
+
+STT Pipeline (Bangla $\rightarrow$ text)
+  & High & High & Partial
+  & Primary path: browser Web Speech API (free, no API cost); quality varies by browser; optional cloud path when API key present. Bangla works best in Chrome/Edge. \\
+
+Session Persistence
+  & Medium & Medium & Complete
+  & Prisma + PostgreSQL (Neon on Netlify); in-memory fallback when \texttt{UHC\_DEMO\_MODE} or missing \texttt{DATABASE\_URL}. \\
+
+Structured History Questionnaire (3--5 questions)
+  & Medium & Medium & Complete
+  & Step-by-step voice Q\&A; bilingual TTS prompts (EN/BN); answers compiled into one transcript for summary. \\
+
+Automated Summary Display (stretch)
+  & Medium & Medium & Complete
+  & GPT-4o when \texttt{OPENAI\_API\_KEY} set; deterministic fallback excerpt when quota/errors; doctor approval before save. \\
+
+Bangla Voice Feedback (stretch)
+  & Medium & Low & Complete
+  & Web Speech API TTS for welcome, record start/stop, and completion cues in BN or EN per patient language. \\
+
+Deployment (Netlify + live URL)
+  & --- & Medium & Complete
+  & Not a separate SOW row but required for GH demos; env vars, Prisma engine for Linux, \texttt{pgbouncer=true} for Neon pooler. \\
+
+\end{longtable}
+
+\noindent\textbf{Out of scope (SOW):} Acuity classification, DHIS2 integration, dialect adaptation, offline mode, and multi-language beyond Bangla---all \textbf{Not Started} by design; no plan to implement in this prototype.
+
+\vspace{1em}
+
+\section*{Part 2: Reflection (3--4 sentences each)}
+
+\subsection*{Biggest divergence from your SOW plan}
+
+The SOW emphasized OpenAI Whisper plus GPT-4o as the primary STT path for Bangla in a ``constrained history-taking'' setting. In practice we leaned heavily on the \textbf{Web Speech API} for transcription to avoid per-minute cloud cost and to keep a working demo without guaranteed API credits. That changed the risk profile: we traded vendor STT accuracy for zero marginal cost and simpler HIPAA-adjacent discussions (browser vs.\ cloud), while still keeping Whisper/transcribe as an optional enhancement when a key is configured.
+
+\subsection*{Hardest thing you built out}
+
+The hardest part was making \textbf{voice + persistence + deployment} feel like one product: MediaRecorder had to flush full audio correctly, Prisma had to run on Netlify with the right query-engine binaries and traced files, and Neon pooler required \texttt{pgbouncer=true} plus env vars scoped to both \textbf{Build} and \textbf{Functions}. Debugging empty error bodies on Netlify taught us to centralize API error parsing and add a small \texttt{/api/health/db} check. None of that was a single ``hard algorithm''---it was integration and operational detail that the SOW underestimated.
+
+\subsection*{One thing you would scope differently}
+
+If I rewrote the SOW today, I would \textbf{sequence STT explicitly}: require a documented ``Tier~A browser STT / Tier~B cloud STT'' decision in Week~7 with acceptance tests in Chrome mobile, and move \textbf{translation} (BN$\rightarrow$EN for physician review) into core scope with a named free tier (e.g.\ MyMemory) instead of treating it as an emergent add-on. I would also add a one-page \textbf{Netlify + Neon checklist} (env scopes, seed user, demo mode) so Week~8--9 are not lost to deployment archaeology.
+
+\end{document}

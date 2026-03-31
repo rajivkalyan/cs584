@@ -1,0 +1,15 @@
+# Netlify config for Next.js — https://docs.netlify.com/frameworks/next-js/overview/
+
+[build]
+  # DATABASE_URL must be scoped to "Builds" (and Functions) in Netlify env UI, or db push never runs.
+  command = "node scripts/netlify-build.cjs"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Ensure devDependencies (prisma CLI, netlify plugin) install during build
+  NPM_CONFIG_PRODUCTION = "false"
+
+# Required so /api/transcribe and /api/translate work on Netlify
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

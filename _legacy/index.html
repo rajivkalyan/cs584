@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#0d47a1" />
+  <title>মেডিকেল হিস্টরি | Medical History</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div id="app">
+    <!-- Screen 1: Physician Login -->
+    <section id="screen-login" class="screen active">
+      <header class="header">
+        <h1 class="logo">মেডিকেল হিস্টরি</h1>
+        <p class="tagline">Medical History Intake</p>
+      </header>
+      <main class="main">
+        <form id="login-form" class="form card">
+          <label for="login-username" class="label">ব্যবহারকারীর নাম / Username</label>
+          <input id="login-username" type="text" autocomplete="username" class="input" placeholder="ডাক্তার আইডি" required />
+          <label for="login-password" class="label">পাসওয়ার্ড / Password</label>
+          <input id="login-password" type="password" autocomplete="current-password" class="input" placeholder="••••••••" required />
+          <button type="submit" class="btn btn-primary btn-block">লগইন / Login</button>
+        </form>
+      </main>
+    </section>
+
+    <!-- Screen 2: Dashboard -->
+    <section id="screen-dashboard" class="screen">
+      <header class="header compact">
+        <h1 class="logo">ড্যাশবোর্ড</h1>
+        <p class="tagline">Dashboard</p>
+        <button type="button" id="btn-logout" class="btn btn-ghost" aria-label="Logout">বাহির / Logout</button>
+      </header>
+      <main class="main">
+        <button type="button" id="btn-new-intake" class="btn btn-primary btn-large btn-block">
+          নতুন সাক্ষাত্কার শুরু করুন / Start New Intake
+        </button>
+        <button type="button" id="btn-register-patient" class="btn btn-secondary btn-block">
+          নতুন রোগী নিবন্ধন / Register New Patient
+        </button>
+        <div class="card">
+          <h2 class="card-title">সাম্প্রতিক রেকর্ড / Recent Records</h2>
+          <ul id="recent-list" class="record-list">
+            <!-- Populated by JS -->
+          </ul>
+        </div>
+      </main>
+    </section>
+
+    <!-- Screen 3: Patient Registration -->
+    <section id="screen-register" class="screen">
+      <header class="header compact">
+        <button type="button" id="btn-back-register" class="btn btn-ghost" aria-label="Back">← পিছনে</button>
+        <h1 class="logo">রোগী নিবন্ধন</h1>
+        <p class="tagline">Patient Registration</p>
+      </header>
+      <main class="main">
+        <form id="register-form" class="form card">
+          <label for="reg-name" class="label">নাম / Name</label>
+          <input id="reg-name" type="text" class="input" placeholder="রোগীর পূর্ণ নাম" required />
+          <label for="reg-age" class="label">বয়স / Age</label>
+          <input id="reg-age" type="number" min="1" max="120" class="input" placeholder="বছর" required />
+          <label for="reg-gender" class="label">লিঙ্গ / Gender</label>
+          <select id="reg-gender" class="input">
+            <option value="">নির্বাচন করুন</option>
+            <option value="male">পুরুষ / Male</option>
+            <option value="female">মহিলা / Female</option>
+            <option value="other">অন্যান্য / Other</option>
+          </select>
+          <label for="reg-village" class="label">গ্রাম / Village</label>
+          <input id="reg-village" type="text" class="input" placeholder="গ্রামের নাম" />
+          <label for="reg-phone" class="label">মোবাইল / Phone</label>
+          <input id="reg-phone" type="tel" class="input" placeholder="০১XXXXXXXXX" />
+          <button type="submit" class="btn btn-primary btn-block">নিবন্ধন করুন / Register</button>
+        </form>
+      </main>
+    </section>
+
+    <!-- Screen 4: Voice Capture -->
+    <section id="screen-voice" class="screen">
+      <header class="header compact">
+        <button type="button" id="btn-back-voice" class="btn btn-ghost" aria-label="Back">← পিছনে</button>
+        <h1 class="logo">কথা বলুন</h1>
+        <p class="tagline">Voice Capture</p>
+      </header>
+      <main class="main">
+        <div class="card">
+          <p id="voice-patient-name" class="voice-patient"></p>
+          <div class="waveform-container">
+            <canvas id="waveform" class="waveform" width="300" height="80" aria-hidden="true"></canvas>
+          </div>
+          <button type="button" id="btn-record" class="btn btn-mic" aria-label="Record">
+            <span class="mic-icon" id="mic-icon">🎤</span>
+            <span id="record-label">রেকর্ড শুরু করুন / Start Recording</span>
+          </button>
+          <p id="record-status" class="record-status" aria-live="polite"></p>
+          <div id="transcript-area" class="transcript-area hidden">
+            <label class="label">ট্রান্সক্রিপ্ট / Transcript</label>
+            <div id="transcript-text" class="transcript-text"></div>
+          </div>
+          <button type="button" id="btn-done-voice" class="btn btn-primary btn-block hidden">সম্পন্ন / Done</button>
+        </div>
+      </main>
+    </section>
+
+    <!-- Screen 5: AI Summary -->
+    <section id="screen-summary" class="screen">
+      <header class="header compact">
+        <button type="button" id="btn-back-summary" class="btn btn-ghost" aria-label="Back">← পিছনে</button>
+        <h1 class="logo">সারাংশ</h1>
+        <p class="tagline">AI Summary</p>
+      </header>
+      <main class="main">
+        <div class="card">
+          <div class="summary-actions">
+            <button type="button" id="btn-export-json" class="btn btn-secondary">JSON ডাউনলোড</button>
+            <button type="button" id="btn-export-pdf" class="btn btn-secondary">PDF ডাউনলোড</button>
+          </div>
+          <div id="summary-content" class="summary-content">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </main>
+    </section>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
