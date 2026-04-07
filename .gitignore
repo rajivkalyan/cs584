@@ -24,9 +24,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# env
-.env
-.env*.local
+# env — never commit secrets; template-only file stays tracked
+.env*
+!.env.example
 
 # Netlify local build output (do not commit)
 .netlify/
@@ -34,6 +34,13 @@ yarn-error.log*
 # legacy / leftovers
 /voice-app/
 
-# IDE
+# Vercel CLI (if used)
+.vercel
+
+# Prisma local SQLite (only if you use a file DB under prisma/)
+/prisma/*.db
+/prisma/*.db-journal
+
+# IDE (optional — remove lines if your team commits shared .vscode settings)
 .idea
 .vscode
