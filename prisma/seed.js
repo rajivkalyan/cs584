@@ -1,15 +1,15 @@
 /**
  * Seed a default UHC physician for development/demo.
  * Run: npm run db:push  (then)  npm run db:seed
- * Set SEED_PASSWORD in .env or use default "1234" (see README).
+ * Set SEED_PASSWORD in .env or use default "uhc-demo-2026" (see README).
  */
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
 
 const prisma = new PrismaClient();
 
-const DEFAULT_EMAIL = "doctor@shuno.online";
-const DEFAULT_PASSWORD = process.env.SEED_PASSWORD || "1234";
+const DEFAULT_EMAIL = "physician@uhc.demo";
+const DEFAULT_PASSWORD = process.env.SEED_PASSWORD || "uhc-demo-2026";
 
 async function main() {
   const hash = await bcrypt.hash(DEFAULT_PASSWORD, 10);

@@ -1,4 +1,4 @@
-TECHNICAL PROJECT DESCRIPTION (pd.txt)
+TECHNICAL PROJECT DESCRIPTION (TDSOW)
 Project: Voice-Enabled AI History-Taking Prototype for Primary Health Care in Bangladesh
 Institution: Emory University
 Phase: Week 8-9 (All Core + Stretch Features Complete)
