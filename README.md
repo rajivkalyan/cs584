@@ -175,6 +175,18 @@ flowchart TB
 
 **Narrative:** The physician uses the **browser** for pages and optional **local speech**. The **Next.js server** authenticates requests, persists **patients** and **intakes** (Postgres or in-memory), and calls **OpenAI** and **MyMemory** from API routes. **Demo mode** skips Postgres for auth and CRUD and keeps state in memory.
 
+### Architecture figures
+
+**Deployment (Dev → GitHub → Netlify → Neon/Postgres)**
+
+![Deployment pipeline: Developer to GitHub to Netlify Build/Runtime to Neon Postgres](docs/images/architecture-deployment.png)
+
+**Application (UI → Next.js routes → data & external APIs)**
+
+![Application layers: User Interface and Auth to Next.js routes to PostgreSQL, in-memory store, OpenAI, and MyMemory](docs/images/architecture-application.png)
+
+Editable **Mermaid** sources for these views (and the diagram above): [`docs/ARCHITECTURE_MERMAID.md`](docs/ARCHITECTURE_MERMAID.md).
+
 ---
 
 ## Stack (reference)
@@ -231,7 +243,7 @@ flowchart TB
 - `lib/` — Auth, Prisma/db helpers, demo detection, copy, API client
 - `prisma/` — `schema.prisma`, `seed.js`
 - `_legacy/` — Old Deno prototype (**not** used by this app)
-- `docs/` — TDSOW (`TDSOW-pd.txt`), Part 1/3 handoff, tech-debt templates; `docs/course/` holds peer-review drafts and checkpoints (not needed to run the app)
+- `docs/` — TDSOW (`TDSOW-pd.txt`), architecture Mermaid + **PNGs** (`images/`, `ARCHITECTURE_MERMAID.md`), Part 1/3 handoff, tech-debt templates; `docs/course/` holds peer-review drafts and checkpoints (not needed to run the app)
 - `scripts/` — Netlify build (`netlify-build.cjs`), GitHub tech-debt helper (`setup-tech-debt-issues.sh`), optional project-board sync (`sync-project-board.sh`)
 
 ---
