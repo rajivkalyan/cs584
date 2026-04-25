@@ -1,7 +1,7 @@
-# SHUNO — Partner handoff (one page)
+# SHUNO - Partner handoff 
 
 **To:** GitHub project partner  
-**From:** *[your name]*  
+**From:** *Rajiv Chilla*  
 **Product:** SHUNO (Union Health Complex Bangladesh voice-intake prototype)
 
 ---
@@ -14,7 +14,7 @@ SHUNO is a web app for **physicians at a Union Health Complex–style clinic** w
 
 ## (b) How to access it
 
-- **Deployed (recommended for a quick look):** *[paste your Netlify URL here, e.g. `https://____.netlify.app`]*  
+- **Deployed (recommended for a quick look):** *`https://darling-raindrop-b4c5ed.netlify.app`*  
 - **Local (for development):** Clone the repo, follow the **README** “Local setup (full path)” or “Fast path (demo mode, no database)” sections, run `npm run dev`, then open the URL Next.js prints (usually `http://localhost:3000`).
 
 If the live site uses **demo mode**, use the **demo** email/password from the README / Netlify env. If it uses **Postgres**, use the **seeded physician** credentials after `npm run db:seed` (also in the README).
@@ -49,4 +49,3 @@ That single path exercises login, intake UI, optional AI pieces, and persistence
 
 ---
 
-*Export this file to PDF or paste into Word for submission; keep to one printed page if your instructor requires strict length.*
